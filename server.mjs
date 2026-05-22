@@ -49,9 +49,9 @@ let db = loadDB();
 
 // --- 採点ロジック ---
 function calculateScore(correct, guess) {
-  if (JSON.stringify(correct) === JSON.stringify(guess)) return 6; // サンレンタン
+  if (JSON.stringify(correct) === JSON.stringify(guess)) return 10; // サンレンタン
   const matched = guess.filter(g => correct.includes(g)).length;
-  if (matched === 3) return 4; // サンレンプク
+  if (matched === 3) return 5; // サンレンプク
   if (correct[0] === guess[0] && correct[1] === guess[1]) return 3; // 1-2位
   if (matched === 2) return 2; // 2つ的中
   if (correct[0] === guess[0]) return 1; // 1位的中
