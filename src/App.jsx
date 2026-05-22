@@ -21,9 +21,9 @@ const socket = io();
 
 function calculateScore(correct, guess) {
   if (!correct || !guess || correct.length < 3 || guess.length < 3) return 0;
-  if (JSON.stringify(correct) === JSON.stringify(guess)) return 6; // サンレンタン
+  if (JSON.stringify(correct) === JSON.stringify(guess)) return 10; // サンレンタン
   const matched = guess.filter(g => correct.includes(g)).length;
-  if (matched === 3) return 4; // サンレンプク
+  if (matched === 3) return 5; // サンレンプク
   if (correct[0] === guess[0] && correct[1] === guess[1]) return 3; // 1-2位
   if (matched === 2) return 2; // 2つ的中
   if (correct[0] === guess[0]) return 1; // 1位的中
@@ -239,69 +239,145 @@ function MonitorView({ state, ranking, revealStep }) {
 }
 
 function MonitorRankingView({ ranking, revealStep }) {
-  // 10-4位 + 25位の抽出
-  const midRanks = ranking.slice(3, 10);
-  const prizeRank = ranking[24]; // 25位
   const top3 = ranking.slice(0, 3);
+  const midRanks = ranking.slice(3, 10); // 4位〜10位
+  const lowerRanks = ranking.slice(10); // 11位〜
+  const prizeRank = ranking.length >= 25 ? ranking[24] : null; // 25位
 
-  const container = {
+  const steps = ['LOWER', 'MID', '3RD', '2ND', '1ST', 'PRIZE'];
+  const stepIndex = steps.indexOf(revealStep);
+  const showLower = stepIndex >= 0;
+  const showMid = stepIndex >= 1;
+  const show3rd = stepIndex >= 2;
+  const show2nd = stepIndex >= 3;
+  const show1st = stepIndex >= 4;
+  const showPrize = stepIndex >= 5;
+
+  const stagger = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+    show: { opacity: 1, transition: { staggerChildren: 0.06 } }
   };
-
-  const item = {
-    hidden: { y: 20, opacity: 0 },
+  const fadeUp = {
+    hidden: { y: 12, opacity: 0 },
     show: { y: 0, opacity: 1 }
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '40px' }}>
-      <h1 style={{ fontSize: '4rem', marginBottom: '40px' }}><Trophy style={{ color: '#ffd700' }} /> 総合ランキング発表</h1>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-        {/* 左側：10位〜4位 + 25位 */}
-        <div style={{ minHeight: '600px' }}>
-          <AnimatePresence>
-            {['LIST', '3RD', '2ND', '1ST'].includes(revealStep) && (
-              <motion.div variants={container} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {midRanks.map((r, i) => (
-                  <motion.div key={r.name} variants={item} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 30px', fontSize: '1.5rem' }}>
-                      <span>{i + 4}位：{r.name}</span>
-                      <span style={{ color: 'var(--text-dim)' }}>{r.total} pts</span>
+    <div style={{ textAlign: 'center', padding: '30px 20px', maxWidth: '900px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '3.5rem', marginBottom: '30px', fontWeight: 800 }}>
+        <Trophy size={40} style={{ color: '#ffd700', verticalAlign: 'middle', marginRight: '12px' }} />
+        総合ランキング発表
+      </h1>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* 1位 */}
+        <AnimatePresence>
+          {show1st && top3[0] && (
+            <motion.div
+              key="1st"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', damping: 12 }}
+              className="ranking-champion"
+            >
+              <div className="ranking-champion-label">🏆 優勝</div>
+              <div className="ranking-champion-name">{top3[0].name}</div>
+              <div className="ranking-champion-pts">{top3[0].total} pts</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 2位 */}
+        <AnimatePresence>
+          {show2nd && top3[1] && (
+            <motion.div
+              key="2nd"
+              initial={{ x: 60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="ranking-podium ranking-silver"
+            >
+              <span className="ranking-podium-label">🥈 2位</span>
+              <span className="ranking-podium-name">{top3[1].name}</span>
+              <span className="ranking-podium-pts">{top3[1].total} pts</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 3位 */}
+        <AnimatePresence>
+          {show3rd && top3[2] && (
+            <motion.div
+              key="3rd"
+              initial={{ x: -60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="ranking-podium ranking-bronze"
+            >
+              <span className="ranking-podium-label">🥉 3位</span>
+              <span className="ranking-podium-name">{top3[2].name}</span>
+              <span className="ranking-podium-pts">{top3[2].total} pts</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 4位〜10位 */}
+        <AnimatePresence>
+          {showMid && midRanks.length > 0 && (
+            <motion.div
+              key="mid"
+              variants={stagger}
+              initial="hidden"
+              animate="show"
+              className="ranking-section"
+            >
+              <div className="ranking-section-label">4位〜10位</div>
+              {midRanks.map((r, i) => (
+                <motion.div key={r.name} variants={fadeUp} className="ranking-row">
+                  <span className="ranking-row-rank">{i + 4}位</span>
+                  <span className="ranking-row-name">{r.name}</span>
+                  <span className="ranking-row-pts">{r.total} pts</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 11位〜 */}
+        <AnimatePresence>
+          {showLower && lowerRanks.length > 0 && (
+            <motion.div
+              key="lower"
+              variants={stagger}
+              initial="hidden"
+              animate="show"
+              className="ranking-section"
+            >
+              <div className="ranking-section-label">11位〜{ranking.length}位</div>
+              <div className="ranking-lower-scroll">
+                {lowerRanks.map((r, i) => (
+                  <motion.div key={r.name} variants={fadeUp} className="ranking-row compact">
+                    <span className="ranking-row-rank">{i + 11}位</span>
+                    <span className="ranking-row-name">{r.name}</span>
+                    <span className="ranking-row-pts">{r.total} pts</span>
                   </motion.div>
                 ))}
-                {prizeRank && (
-                  <motion.div variants={item} className="glass-card" style={{ marginTop: '20px', border: '2px solid #ff4b4b', padding: '15px 30px', fontSize: '1.8rem', background: 'rgba(255, 75, 75, 0.1)' }}>
-                      <span>🎁 25位（特別賞）：{prizeRank.name}</span>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* 右側：トップ3個別に表示 */}
-        <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: '20px', justifyContent: 'center', minHeight: '600px' }}>
-           <AnimatePresence>
-              {revealStep === '1ST' ? (
-                <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1.1, opacity: 1 }} className="ans-badge gold" style={{ fontSize: '5rem', padding: '40px' }}>
-                    <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>🏆 優勝</div>
-                    {top3[0]?.name}
-                    <div style={{ fontSize: '2rem', marginTop: '10px' }}>{top3[0]?.total} pts</div>
-                </motion.div>
-              ) : null}
-              {['2ND', '1ST'].includes(revealStep) ? (
-                <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="ans-badge silver" style={{ fontSize: '4rem', padding: '20px' }}>
-                    🥈 2位：{top3[1]?.name} ({top3[1]?.total} pts)
-                </motion.div>
-              ) : null}
-              {['3RD', '2ND', '1ST'].includes(revealStep) ? (
-                <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="ans-badge bronze" style={{ fontSize: '3rem', padding: '15px' }}>
-                    🥉 3位：{top3[2]?.name} ({top3[2]?.total} pts)
-                </motion.div>
-              ) : null}
-           </AnimatePresence>
-        </div>
+        {/* 25位 特別賞 */}
+        <AnimatePresence>
+          {showPrize && prizeRank && (
+            <motion.div
+              key="prize"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="ranking-prize"
+            >
+              🎁 25位（特別賞）：{prizeRank.name}（{prizeRank.total} pts）
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -369,10 +445,12 @@ function AdminView({ state, socket, ranking, revealStep }) {
         <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
             <h3>3. 最終ランキング演出コントロール</h3>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <button className="btn-primary" onClick={() => setStep('LIST')}><Play size={16} /> 10〜4位/25位表示</button>
+                <button className="btn-primary" onClick={() => setStep('LOWER')}><Play size={16} /> 参加者〜11位</button>
+                <button className="btn-primary" onClick={() => setStep('MID')}><SkipForward size={16} /> 10〜4位</button>
                 <button className="btn-primary" onClick={() => setStep('3RD')}><SkipForward size={16} /> 3位発表</button>
                 <button className="btn-primary" onClick={() => setStep('2ND')}><SkipForward size={16} /> 2位発表</button>
                 <button className="btn-primary" onClick={() => setStep('1ST')}><Trophy size={16} /> 優勝者発表</button>
+                <button className="btn-primary" onClick={() => setStep('PRIZE')}>🎁 25位(特別賞)</button>
                 <button className="btn-secondary" onClick={() => setStep('OFF')}><RotateCcw size={16} /> 演出リセット</button>
             </div>
         </div>

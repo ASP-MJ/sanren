@@ -221,3 +221,164 @@ table td {
   justify-content: space-between;
   align-items: center;
 }
+
+/* ========== ランキング演出用スタイル ========== */
+
+/* 1位 チャンピオンカード */
+.ranking-champion {
+  padding: 30px 24px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 215, 0, 0.04));
+  border: 2px solid rgba(255, 215, 0, 0.25);
+  border-radius: 16px;
+}
+
+.ranking-champion-label {
+  font-size: 1.3rem;
+  color: #ffd700;
+  margin-bottom: 8px;
+}
+
+.ranking-champion-name {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-champion-pts {
+  font-size: 1.8rem;
+  color: #ffd700;
+  margin-top: 6px;
+}
+
+/* 2位・3位 表彰台行 */
+.ranking-podium {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  min-width: 0; /* flex子要素のtruncateを有効にする */
+}
+
+.ranking-podium-label {
+  flex-shrink: 0;
+  margin-right: 16px;
+}
+
+.ranking-podium-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-podium-pts {
+  flex-shrink: 0;
+  margin-left: 16px;
+  color: var(--text-dim);
+  font-size: 1.3rem;
+}
+
+.ranking-silver {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.ranking-bronze {
+  background: rgba(180, 83, 9, 0.1);
+  border: 1px solid rgba(180, 83, 9, 0.2);
+}
+
+/* 順位セクション（4-10位、11位〜） */
+.ranking-section {
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+
+.ranking-section-label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-align: left;
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 順位行 */
+.ranking-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  min-width: 0;
+}
+
+.ranking-row:last-child {
+  border-bottom: none;
+}
+
+.ranking-row.compact {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.ranking-row-rank {
+  width: 48px;
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-align: left;
+}
+
+.ranking-row-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0 12px;
+}
+
+.ranking-row-pts {
+  flex-shrink: 0;
+  font-weight: bold;
+  color: var(--text-dim);
+}
+
+/* 11位〜のスクロール領域 */
+.ranking-lower-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.ranking-lower-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ranking-lower-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ranking-lower-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* 25位 特別賞 */
+.ranking-prize {
+  padding: 20px 30px;
+  background: rgba(255, 75, 75, 0.08);
+  border: 2px solid rgba(255, 75, 75, 0.25);
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
