@@ -98,9 +98,9 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h2 style={{ margin: 0, fontWeight: 800, letterSpacing: '2px', background: 'var(--accent-gold)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          SANRENTAN
+       <div className="flex-between" style={{ marginBottom: '30px' }}>
+        <h2 className="brand-title">
+          SANRENTAN PRO
         </h2>
       </div>
 
@@ -116,7 +116,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
                   <div className="ans-badge silver">🥈 {state.last_ans[1]}</div>
                   <div className="ans-badge bronze">🥉 {state.last_ans[2]}</div>
               </div>
-              <button onClick={() => { loadRanking(); setIsRankingView(true); }} className="btn-primary" style={{ marginTop: '40px', background: 'rgba(255,255,255,0.1)' }}>
+              <button onClick={() => { loadRanking(); setIsRankingView(true); }} className="btn-secondary" style={{ marginTop: '40px' }}>
                   自分の順位を確認
               </button>
           </div>
@@ -305,7 +305,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
                 <textarea className="input-glass" value={opts} onChange={(e) => setOpts(e.target.value)} rows={3} />
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button className="btn-primary" style={{ flex: 2 }} onClick={() => socket.emit('admin-action', { type: 'UPDATE_QUESTION', payload: { current_q: parseInt(qNum), q_text: qText, options: opts.split(',').map(s => s.trim()) } })}>投票開始</button>
-                    <button className="btn-primary" style={{ flex: 1, background: '#ff4b4b' }} onClick={() => socket.emit('admin-action', { type: 'CLOSE_VOTING' })}>締切</button>
+                    <button className="btn-danger" style={{ flex: 1 }} onClick={() => socket.emit('admin-action', { type: 'CLOSE_VOTING' })}>締切</button>
                 </div>
             </div>
             <div>
@@ -329,7 +329,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
                 <button className="btn-primary" onClick={() => setStep('3RD')}><SkipForward size={16} /> 3位発表</button>
                 <button className="btn-primary" onClick={() => setStep('2ND')}><SkipForward size={16} /> 2位発表</button>
                 <button className="btn-primary" onClick={() => setStep('1ST')}><Trophy size={16} /> 優勝者発表</button>
-                <button className="btn-primary" style={{ background: '#444' }} onClick={() => setStep('OFF')}><RotateCcw size={16} /> 演出リセット</button>
+                <button className="btn-secondary" onClick={() => setStep('OFF')}><RotateCcw size={16} /> 演出リセット</button>
             </div>
         </div>
       </div>
