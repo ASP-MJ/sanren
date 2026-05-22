@@ -63,6 +63,11 @@ function App() {
     socket.on('vote-success', () => setVoteSuccess(true));
     socket.on('ranking-data', (data) => setRanking(data));
     socket.on('ranking-reveal-update', (step) => setRevealStep(step));
+    socket.on('votes-reset', (qNum) => {
+      localStorage.removeItem(`sanrentan_guess_${qNum}`);
+      setVoteSuccess(false);
+      setGuesses(['', '', '']);
+    });
 
     // 初回読み込み
     socket.emit('get-ranking');
@@ -72,6 +77,7 @@ function App() {
       socket.off('vote-success');
       socket.off('ranking-data');
       socket.off('ranking-reveal-update');
+      socket.off('votes-reset');
     };
   }, []);
 
@@ -426,6 +432,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button className="btn-primary" style={{ flex: 2 }} onClick={() => socket.emit('admin-action', { type: 'UPDATE_QUESTION', payload: { current_q: parseInt(qNum), q_text: qText, options: opts.split(',').map(s => s.trim()) } })}>投票開始</button>
                     <button className="btn-danger" style={{ flex: 1 }} onClick={() => socket.emit('admin-action', { type: 'CLOSE_VOTING' })}>締切</button>
+                    <button className="btn-secondary" style={{ flex: 1 }} onClick={() => { if(confirm('この問題の全投票をリセットしますか？')) socket.emit('admin-action', { type: 'RESET_VOTES' }); }}>リセット</button>
                 </div>
             </div>
             <div>
