@@ -30,6 +30,16 @@ function calculateScore(correct, guess) {
   return 0;
 }
 
+// ローカルストレージから sanrentan_guess_* キーをすべて削除
+function clearAllGuesses() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('sanrentan_guess_')) keys.push(k);
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+}
+
 function App() {
   const [state, setState] = useState({
     current_q: 1,
@@ -63,17 +73,13 @@ function App() {
     socket.on('vote-success', () => setVoteSuccess(true));
     socket.on('ranking-data', (data) => setRanking(data));
     socket.on('ranking-reveal-update', (step) => setRevealStep(step));
-    socket.on('votes-reset', (qNum) => {
-      if (qNum === null) {
-        // 全問リセット: sanrentan_guess_* を全削除
-        Object.keys(localStorage)
-          .filter(k => k.startsWith('sanrentan_guess_'))
-          .forEach(k => localStorage.removeItem(k));
-      } else {
-        localStorage.removeItem(`sanrentan_guess_${qNum}`);
-      }
+
+    // 全リセット: サーバーから 'all-reset' が来たらクライアント側の投票記録をすべてクリア
+    socket.on('all-reset', () => {
+      clearAllGuesses();
       setVoteSuccess(false);
       setGuesses(['', '', '']);
+      setRanking([]);
     });
 
     // 初回読み込み
@@ -84,7 +90,7 @@ function App() {
       socket.off('vote-success');
       socket.off('ranking-data');
       socket.off('ranking-reveal-update');
-      socket.off('votes-reset');
+      socket.off('all-reset');
     };
   }, []);
 
@@ -403,6 +409,13 @@ function AdminView({ state, socket, ranking, revealStep }) {
   const [correct, setCorrect] = useState(['', '', '']);
   const [pwd, setPwd] = useState('');
   const [isLogged, setIsLogged] = useState(false);
+  const [answerMode, setAnswerMode] = useState('manual'); // 'manual' | 'from-vote'
+  const [votes, setVotes] = useState([]);
+
+  useEffect(() => {
+    socket.on('votes-data', (data) => setVotes(data));
+    return () => socket.off('votes-data');
+  }, [socket]);
 
   if (!isLogged) {
     return (
@@ -415,6 +428,21 @@ function AdminView({ state, socket, ranking, revealStep }) {
   }
 
   const setStep = (step) => socket.emit('admin-reveal-step', step);
+
+  const handleResetAll = () => {
+    const ok = window.confirm(
+      '【全リセット】を実行します。\n\n' +
+      '・全員の投票データを削除\n' +
+      '・ランキングをクリア\n' +
+      '・問題番号を1に戻す\n' +
+      '・全ブラウザの投票ロックを解除\n\n' +
+      'よろしいですか？'
+    );
+    if (!ok) return;
+    const ok2 = window.confirm('本当に全データをリセットしますか？この操作は取り消せません。');
+    if (!ok2) return;
+    socket.emit('admin-action', { type: 'RESET_ALL' });
+  };
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
@@ -439,42 +467,78 @@ function AdminView({ state, socket, ranking, revealStep }) {
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button className="btn-primary" style={{ flex: 2 }} onClick={() => socket.emit('admin-action', { type: 'UPDATE_QUESTION', payload: { current_q: parseInt(qNum), q_text: qText, options: opts.split(',').map(s => s.trim()) } })}>投票開始</button>
                     <button className="btn-danger" style={{ flex: 1 }} onClick={() => socket.emit('admin-action', { type: 'CLOSE_VOTING' })}>締切</button>
-                    <button className="btn-secondary" style={{ flex: 1 }} onClick={() => { if(confirm('この問題の全投票をリセットしますか？')) socket.emit('admin-action', { type: 'RESET_VOTES' }); }}>リセット</button>
                 </div>
             </div>
             <div>
                 <h3>2. 正解入力・採点</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {[0,1,2].map(i => (
-                        <select key={i} className="select-glass" value={correct[i]} onChange={(e) => { const c = [...correct]; c[i] = e.target.value; setCorrect(c); }}>
-                            <option value="">{i+1}位の正解</option>
-                            {state.options.map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                    ))}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                    <button
+                      className={answerMode === 'manual' ? 'btn-primary' : 'btn-secondary'}
+                      style={{ flex: 1, fontSize: '0.8rem', padding: '6px 10px' }}
+                      onClick={() => setAnswerMode('manual')}
+                    >手動入力</button>
+                    <button
+                      className={answerMode === 'from-vote' ? 'btn-primary' : 'btn-secondary'}
+                      style={{ flex: 1, fontSize: '0.8rem', padding: '6px 10px' }}
+                      onClick={() => { setAnswerMode('from-vote'); socket.emit('get-votes'); }}
+                    >回答から採用</button>
                 </div>
+
+                {answerMode === 'manual' ? (
+                  <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {[0,1,2].map(i => (
+                            <select key={i} className="select-glass" value={correct[i]} onChange={(e) => { const c = [...correct]; c[i] = e.target.value; setCorrect(c); }}>
+                                <option value="">{i+1}位の正解</option>
+                                {state.options.map(o => <option key={o} value={o}>{o}</option>)}
+                            </select>
+                        ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '10px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+                      {votes.length === 0 ? (
+                        <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
+                          投票データがありません
+                        </div>
+                      ) : (
+                        votes.map((v, i) => (
+                          <div key={v.name} style={{
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            padding: '8px 12px',
+                            borderBottom: i < votes.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                            background: correct[0] === v.guesses[0] && correct[1] === v.guesses[1] && correct[2] === v.guesses[2]
+                              ? 'rgba(0,230,118,0.1)' : 'transparent'
+                          }}>
+                            <div style={{ fontSize: '0.8rem' }}>
+                              <span style={{ fontWeight: 'bold', marginRight: '10px' }}>{v.name}</span>
+                              <span style={{ color: 'var(--text-dim)' }}>
+                                {v.guesses[0]} → {v.guesses[1]} → {v.guesses[2]}
+                              </span>
+                            </div>
+                            <button
+                              className="btn-secondary"
+                              style={{ fontSize: '0.7rem', padding: '4px 10px', whiteSpace: 'nowrap' }}
+                              onClick={() => setCorrect([...v.guesses])}
+                            >採用</button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    {correct[0] && (
+                      <div style={{ fontSize: '0.85rem', padding: '8px', background: 'rgba(0,230,118,0.05)', borderRadius: '6px', marginBottom: '8px' }}>
+                        正解にセット済: <strong>{correct[0]} → {correct[1]} → {correct[2]}</strong>
+                      </div>
+                    )}
+                  </>
+                )}
+
                 <button className="btn-primary" style={{ marginTop: '10px', width: '100%' }} onClick={() => socket.emit('admin-action', { type: 'REVEAL_RESULTS', payload: { correct } })}>正解発表</button>
             </div>
         </div>
 
-        <div style={{ marginTop: '30px', borderTop: '1px solid rgba(255,75,75,0.3)', paddingTop: '20px', background: 'rgba(255,75,75,0.05)', borderRadius: '8px', padding: '20px' }}>
-            <h3 style={{ color: '#ff4b4b', margin: '0 0 12px 0' }}>⚠️ 全データリセット</h3>
-            <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
-                スコア・投票・ユーザーデータをすべて削除し、第1問からやり直します。参加者のブラウザの投票済みフラグも解除されます。
-            </p>
-            <button
-              className="btn-danger"
-              onClick={() => {
-                if (confirm('全データをリセットします。この操作は取り消せません。よろしいですか？')) {
-                  socket.emit('admin-action', { type: 'RESET_ALL' });
-                }
-              }}
-            >
-              <RotateCcw size={16} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-              全データリセット（第1問からやり直し）
-            </button>
-        </div>
-
-        <div style={{ marginTop: '30px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+        <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
             <h3>3. 最終ランキング演出コントロール</h3>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 <button className="btn-primary" onClick={() => setStep('LOWER')}><Play size={16} /> 参加者〜11位</button>
@@ -485,6 +549,18 @@ function AdminView({ state, socket, ranking, revealStep }) {
                 <button className="btn-primary" onClick={() => setStep('PRIZE')}>🎁 25位(特別賞)</button>
                 <button className="btn-secondary" onClick={() => setStep('OFF')}><RotateCcw size={16} /> 演出リセット</button>
             </div>
+        </div>
+
+        {/* 全リセット（イベントやり直し用） */}
+        <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,75,75,0.3)', paddingTop: '20px' }}>
+            <h3 style={{ color: '#ff4b4b' }}>⚠️ 危険ゾーン</h3>
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
+                全投票・全ランキングを消去し、問題番号を1に戻します。全ブラウザの投票ロックも解除されます。
+            </p>
+            <button className="btn-danger" onClick={handleResetAll}>
+                <RotateCcw size={16} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+                全データをリセット（イベントやり直し）
+            </button>
         </div>
       </div>
 
