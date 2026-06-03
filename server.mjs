@@ -120,7 +120,7 @@ io.on('connection', (socket) => {
     saveDB(db);
     io.emit('sync-state', db.settings);
     if (type === 'RESET_ALL') {
-        io.emit('votes-reset', null); // null = 全問リセット
+        io.emit('all-reset');
     }
     if (type === 'REVEAL_RESULTS') {
         const currentScores = db.scores.filter(s => s.q_id === db.settings.current_q);
@@ -138,6 +138,15 @@ io.on('connection', (socket) => {
     }).sort((a, b) => b.total - a.total);
     
     socket.emit('ranking-data', ranking);
+  });
+
+  // 現在の問題の投票一覧（管理者用）
+  socket.on('get-votes', () => {
+    const q_id = db.settings.current_q;
+    const currentVotes = db.scores
+      .filter(s => s.q_id === q_id)
+      .map(s => ({ name: s.name, guesses: [s.g1, s.g2, s.g3] }));
+    socket.emit('votes-data', currentVotes);
   });
 
   // ランキング演出コントロール
