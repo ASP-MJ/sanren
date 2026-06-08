@@ -384,20 +384,52 @@ function MonitorRankingView({ ranking, revealStep }) {
           )}
         </AnimatePresence>
 
-        {/* 25位 特別賞 */}
-        <AnimatePresence>
-          {showPrize && prizeRank && (
-            <motion.div
-              key="prize"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="ranking-prize"
-            >
-              🎁 25位（特別賞）：{prizeRank.name}（{prizeRank.total} pts）
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* 25位 特別賞（画面中央にオーバーレイ表示） */}
+      <AnimatePresence>
+        {showPrize && prizeRank && (
+          <motion.div
+            key="prize-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.82)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '20px'
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.6, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: 'spring', damping: 14, stiffness: 200 }}
+              className="ranking-prize"
+              style={{
+                textAlign: 'center',
+                maxWidth: '90vw',
+                padding: '50px 60px'
+              }}
+            >
+              <div style={{ fontSize: '4rem', marginBottom: '10px' }}>🎁</div>
+              <div style={{ fontSize: '1.6rem', fontWeight: 700, opacity: 0.85, marginBottom: '20px' }}>
+                25位 特別賞
+              </div>
+              <div style={{ fontSize: '4rem', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px' }}>
+                {prizeRank.name}
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, opacity: 0.9 }}>
+                {prizeRank.total} pts
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
