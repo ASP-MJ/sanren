@@ -1,65 +1,70 @@
 :root {
-  /* 洗練されたモダンなダークスレート配色 */
-  --bg-color: #0b0f19;
-  --card-bg: #111827;
-  --card-border: rgba(255, 255, 255, 0.06);
-  --card-border-hover: rgba(255, 255, 255, 0.12);
-  
-  /* プライマリブランドカラー（信頼感のあるインディゴブルー） */
-  --color-primary: #4f46e5;
-  --color-primary-hover: #6366f1;
-  --color-primary-active: #4338ca;
-  
-  /* テキスト色 */
-  --text-main: #f3f4f6;
-  --text-dim: #9ca3af;
-  --border-focus: #6366f1;
+  --bg-color: #f4f6f8;
+  --bg-secondary: #ffffff;
+  --card-bg: #ffffff;
+  --card-border: rgba(3, 69, 122, 0.12);
+  --card-border-hover: rgba(3, 69, 122, 0.28);
+
+  --color-primary: #03457A;
+  --color-primary-hover: #025090;
+  --color-primary-active: #023a6a;
+  --color-primary-light: rgba(3, 69, 122, 0.07);
+
+  --color-accent: #FF521E;
+  --color-accent-hover: #e84518;
+  --color-accent-light: rgba(255, 82, 30, 0.08);
+
+  --text-main: #111827;
+  --text-dim: #6b7280;
+  --text-on-primary: #ffffff;
+  --border-focus: #03457A;
 }
 
 body {
   margin: 0;
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+  font-family: 'Noto Sans JP', 'Inter', -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* カードデザイン（ネオン発光・過度な半透明ガラスを廃止し、フラットで薄いボーダーの洗練されたデザインに変更） */
+/* ========== カード ========== */
 .glass-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(3, 69, 122, 0.07);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .glass-card:hover {
   border-color: var(--card-border-hover);
+  box-shadow: 0 4px 20px rgba(3, 69, 122, 0.1);
 }
 
-/* ネオングロウ効果を無効化（代わりに上品なシャドウに変更） */
 .neon-glow {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 12px rgba(3, 69, 122, 0.08);
 }
 
-/* ボタン（角を適度に丸め、インディゴ色のモダンなフラットボタンに変更） */
+/* ========== ボタン ========== */
 .btn-primary {
   background: var(--color-primary);
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 12px 24px;
-  color: #ffffff;
+  color: var(--text-on-primary);
   font-weight: 600;
   font-size: 0.95rem;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
 }
 
 .btn-primary:hover {
   background: var(--color-primary-hover);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 4px 12px rgba(3, 69, 122, 0.25);
 }
 
 .btn-primary:active {
@@ -68,11 +73,11 @@ body {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
   padding: 12px 24px;
-  color: #ffffff;
+  color: var(--color-primary);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
@@ -80,8 +85,8 @@ body {
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
 }
 
 .btn-secondary:active {
@@ -89,9 +94,9 @@ body {
 }
 
 .btn-danger {
-  background: #ef4444;
+  background: var(--color-accent);
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 12px 24px;
   color: #ffffff;
   font-weight: 600;
@@ -101,19 +106,19 @@ body {
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: var(--color-accent-hover);
 }
 
 .btn-danger:active {
   transform: scale(0.98);
 }
 
-/* インプット・セレクト（入力フィールドも背景と調和するモダンなスレート調に統一） */
+/* ========== 入力フォーム ========== */
 .input-glass {
-  background: #1f2937;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  color: var(--text-main);
   padding: 12px 16px;
   width: 100%;
   box-sizing: border-box;
@@ -125,14 +130,14 @@ body {
 
 .input-glass:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(3, 69, 122, 0.12);
 }
 
 .select-glass {
-  background: #1f2937;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  color: var(--text-main);
   padding: 12px 16px;
   width: 100%;
   box-sizing: border-box;
@@ -146,12 +151,12 @@ body {
   border-color: var(--border-focus);
 }
 
-/* 順位バッジ（サイバーネオン発光から、コントラストが効いたミニマルで上品なタグに変更） */
+/* ========== 正解バッジ ========== */
 .ans-badge {
   font-size: 1.1rem;
   font-weight: 700;
   padding: 10px 24px;
-  border-radius: 9999px; /* 丸いカプセル型 */
+  border-radius: 6px;
   text-align: center;
   display: inline-flex;
   align-items: center;
@@ -160,56 +165,57 @@ body {
   margin: 5px;
 }
 
-.gold { 
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+.gold {
+  background: rgba(180, 130, 0, 0.08);
+  color: #b47e00;
+  border: 1px solid rgba(180, 130, 0, 0.25);
 }
 
 .silver {
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(90, 100, 115, 0.08);
+  color: #4b5563;
+  border: 1px solid rgba(90, 100, 115, 0.25);
 }
 
 .bronze {
-  background: rgba(180, 83, 9, 0.12);
-  color: #f97316;
-  border: 1px solid rgba(180, 83, 9, 0.3);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border: 1px solid rgba(255, 82, 30, 0.25);
 }
 
-/* ブランドヘッダー */
+/* ========== ブランド ========== */
 .brand-title {
   margin: 0;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1.5rem;
-  letter-spacing: -0.025em;
-  color: #ffffff;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
 }
 
-/* Liveインジケーター */
+/* ========== Liveインジケーター ========== */
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.7; }
-  100% { transform: scale(1); opacity: 1; }
+  0%   { transform: scale(1);   opacity: 1;   }
+  50%  { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1);   opacity: 1;   }
 }
 
 .live-indicator {
   width: 8px;
   height: 8px;
-  background: #ef4444;
+  background: var(--color-accent);
   border-radius: 50%;
   display: inline-block;
   margin-right: 8px;
   animation: pulse 2s infinite ease-in-out;
 }
 
-/* テーブルスタイル */
+/* ========== テーブル ========== */
 table th {
   font-weight: 600;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: var(--text-dim);
 }
 
 table td {
@@ -222,19 +228,22 @@ table td {
   align-items: center;
 }
 
-/* ========== ランキング演出用スタイル ========== */
+/* ========== ランキング演出 ========== */
 
-/* 1位 チャンピオンカード */
+/* 1位 チャンピオン */
 .ranking-champion {
   padding: 30px 24px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 215, 0, 0.04));
-  border: 2px solid rgba(255, 215, 0, 0.25);
-  border-radius: 16px;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
 }
 
 .ranking-champion-label {
-  font-size: 1.3rem;
-  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.1em;
   margin-bottom: 8px;
 }
 
@@ -245,23 +254,25 @@ table td {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #ffffff;
 }
 
 .ranking-champion-pts {
   font-size: 1.8rem;
-  color: #ffd700;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
   margin-top: 6px;
 }
 
-/* 2位・3位 表彰台行 */
+/* 2位・3位 */
 .ranking-podium {
   display: flex;
   align-items: center;
   padding: 16px 24px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 1.6rem;
   font-weight: 600;
-  min-width: 0; /* flex子要素のtruncateを有効にする */
+  min-width: 0;
 }
 
 .ranking-podium-label {
@@ -276,6 +287,7 @@ table td {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-main);
 }
 
 .ranking-podium-pts {
@@ -286,30 +298,33 @@ table td {
 }
 
 .ranking-silver {
-  background: rgba(148, 163, 184, 0.1);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(3, 69, 122, 0.06);
+  border: 1px solid rgba(3, 69, 122, 0.15);
 }
 
 .ranking-bronze {
-  background: rgba(180, 83, 9, 0.1);
-  border: 1px solid rgba(180, 83, 9, 0.2);
+  background: var(--color-accent-light);
+  border: 1px solid rgba(255, 82, 30, 0.2);
 }
 
-/* 順位セクション（4-10位、11位〜） */
+/* 順位セクション */
 .ranking-section {
   padding: 16px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .ranking-section-label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-dim);
   text-align: left;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   padding-bottom: 10px;
   margin-bottom: 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--card-border);
 }
 
 /* 順位行 */
@@ -317,13 +332,11 @@ table td {
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--card-border);
   min-width: 0;
 }
 
-.ranking-row:last-child {
-  border-bottom: none;
-}
+.ranking-row:last-child { border-bottom: none; }
 
 .ranking-row.compact {
   padding: 6px 12px;
@@ -346,39 +359,36 @@ table td {
   text-overflow: ellipsis;
   white-space: nowrap;
   margin: 0 12px;
+  color: var(--text-main);
 }
 
 .ranking-row-pts {
   flex-shrink: 0;
-  font-weight: bold;
-  color: var(--text-dim);
+  font-weight: 700;
+  color: var(--color-primary);
 }
 
-/* 11位〜のスクロール領域 */
+/* 11位〜スクロール領域 */
 .ranking-lower-scroll {
   max-height: 360px;
   overflow-y: auto;
 }
 
-.ranking-lower-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-
-.ranking-lower-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+.ranking-lower-scroll::-webkit-scrollbar { width: 4px; }
+.ranking-lower-scroll::-webkit-scrollbar-track { background: transparent; }
 .ranking-lower-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-border);
   border-radius: 2px;
 }
 
-/* 25位 特別賞 */
+/* 25位 特別賞（オーバーレイ内カード） */
 .ranking-prize {
-  padding: 20px 30px;
-  background: rgba(255, 75, 75, 0.08);
-  border: 2px solid rgba(255, 75, 75, 0.25);
-  border-radius: 12px;
+  padding: 50px 60px;
+  background: #ffffff;
+  border: 3px solid var(--color-accent);
+  border-radius: 16px;
   font-size: 1.5rem;
   font-weight: 600;
+  color: var(--text-main);
+  box-shadow: 0 24px 60px rgba(255, 82, 30, 0.15);
 }

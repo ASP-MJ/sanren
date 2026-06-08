@@ -155,7 +155,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
         
         {state.show_ans ? (
           <div style={{ marginTop: '20px' }}>
-              <h2 style={{ color: '#ff4b4b' }}>正解発表</h2>
+              <h2 style={{ color: 'var(--color-accent)' }}>正解発表</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
                   <div className="ans-badge gold">🥇 {state.last_ans[0]}</div>
                   <div className="ans-badge silver">🥈 {state.last_ans[1]}</div>
@@ -163,7 +163,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
               </div>
 
               {/* 自分の予想と獲得ポイントの表示 */}
-              <div style={{ marginTop: '30px', padding: '20px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+              <div style={{ marginTop: '30px', padding: '20px', background: 'var(--color-primary-light)', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
                   {savedGuesses ? (
                       <>
                           <div style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginBottom: '8px' }}>あなたの予想</div>
@@ -173,7 +173,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
                               <span>3位: <strong>{savedGuesses[2]}</strong></span>
                           </div>
                           <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                              獲得ポイント: <span style={{ color: '#10b981', fontSize: '1.5rem' }}>{pointsEarned}</span> pts
+                              獲得ポイント: <span style={{ color: 'var(--color-primary)', fontSize: '1.5rem' }}>{pointsEarned}</span> pts
                           </div>
                       </>
                   ) : (
@@ -207,7 +207,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
             </div>
           ) : (
             <div style={{ padding: '40px' }}>
-                <CheckCircle size={64} style={{ color: '#00e676', marginBottom: '20px' }} />
+                <CheckCircle size={64} style={{ color: 'var(--color-primary)', marginBottom: '20px' }} />
                 <h3>受付完了！発表をお待ちください</h3>
             </div>
           )
@@ -482,8 +482,8 @@ function AdminView({ state, socket, ranking, revealStep }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h2>🔧 管理ポータル</h2>
             <div style={{ display: 'flex', gap: '10px' }}>
-                <Link to="/" className="glass-card" style={{ padding: '8px 12px', color: 'white', textDecoration: 'none', fontSize: '0.8rem' }}>参加者</Link>
-                <Link to="/monitor" className="glass-card" style={{ padding: '8px 12px', color: 'white', textDecoration: 'none', fontSize: '0.8rem' }}>モニター</Link>
+                <Link to="/" className="glass-card" style={{ padding: '8px 12px', color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem' }}>参加者</Link>
+                <Link to="/monitor" className="glass-card" style={{ padding: '8px 12px', color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem' }}>モニター</Link>
             </div>
         </div>
         
@@ -585,7 +585,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
 
         {/* 全リセット（イベントやり直し用） */}
         <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,75,75,0.3)', paddingTop: '20px' }}>
-            <h3 style={{ color: '#ff4b4b' }}>⚠️ 危険ゾーン</h3>
+            <h3 style={{ color: 'var(--color-accent)' }}>⚠️ 危険ゾーン</h3>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
                 全投票・全ランキングを消去し、問題番号を1に戻します。全ブラウザの投票ロックも解除されます。
             </p>
@@ -601,7 +601,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
         <h3>📊 リアルタイム全順位</h3>
         <div style={{ maxHeight: '650px', overflowY: 'auto' }}>
             {ranking.map((r, i) => (
-                <div key={r.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 4px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: i === 24 ? 'rgba(255,75,75,0.1)' : 'transparent' }}>
+                <div key={r.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 4px', borderBottom: '1px solid var(--card-border)', background: i === 24 ? 'rgba(255,75,75,0.1)' : 'transparent' }}>
                     <span>{i+1}. {r.name} {i === 24 ? '🎁' : ''}</span>
                     <span style={{ fontWeight: 'bold' }}>{r.total} pts</span>
                 </div>
@@ -617,13 +617,13 @@ function RankingView({ ranking, goBack }) {
     return (
         <motion.div initial={{ opacity: 0 }} className="glass-card" style={{ padding: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                <button onClick={goBack} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', marginRight: '15px' }}><ChevronLeft size={24} /></button>
+                <button onClick={goBack} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', marginRight: '15px' }}><ChevronLeft size={24} /></button>
                 <h1 style={{ margin: 0 }}><Trophy style={{ color: '#ffd700', marginRight: '10px' }} /> あなたの順位結果</h1>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead><tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-dim)' }}><th style={{ textAlign: 'left', padding: '15px' }}>順位</th><th style={{ textAlign: 'left', padding: '15px' }}>名前</th><th style={{ textAlign: 'right', padding: '15px' }}>ポイント</th></tr></thead>
                 <tbody>{ranking.map((row, i) => (
-                    <tr key={row.name} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}><td style={{ padding: '15px', fontWeight: 'bold' }}>{i + 1}</td><td style={{ padding: '15px' }}>{row.name}</td><td style={{ padding: '15px', textAlign: 'right', color: '#00e676', fontWeight: 'bold' }}>{row.total} pts</td></tr>
+                    <tr key={row.name} style={{ borderBottom: '1px solid var(--card-border)' }}><td style={{ padding: '15px', fontWeight: 'bold' }}>{i + 1}</td><td style={{ padding: '15px' }}>{row.name}</td><td style={{ padding: '15px', textAlign: 'right', color: 'var(--color-primary)', fontWeight: 'bold' }}>{row.total} pts</td></tr>
                 ))}</tbody>
             </table>
         </motion.div>
