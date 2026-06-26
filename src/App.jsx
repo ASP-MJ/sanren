@@ -435,7 +435,6 @@ function MonitorRankingView({ ranking, revealStep }) {
                 padding: '50px 60px'
               }}
             >
-              <div style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)', marginBottom: '10px' }}>🎁</div>
               <div style={{ fontSize: 'clamp(1.1rem, 2.4vw, 2.4rem)', fontWeight: 700, opacity: 0.85, marginBottom: '20px' }}>
                 25位 特別賞
               </div>
