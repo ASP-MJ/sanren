@@ -96,7 +96,7 @@ function App() {
 
   const submitVote = () => {
     if (!myName.trim()) return alert("名前を入力してください");
-    if (new Set(guesses).size !== 3 || guesses.includes('')) return alert("重複なく3名選んでください");
+    if (new Set(guesses).size !== 3 || guesses.includes('')) return alert("重複なく3つ選んでください");
     localStorage.setItem('sanrentan_name', myName);
     localStorage.setItem(`sanrentan_guess_${state.current_q}`, JSON.stringify(guesses));
     socket.emit('submit-vote', { name: myName, guesses });
