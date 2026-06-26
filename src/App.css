@@ -240,7 +240,7 @@ table td {
 }
 
 .ranking-champion-label {
-  font-size: 1rem;
+  font-size: clamp(0.85rem, 1.3vw, 1.3rem);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.1em;
@@ -248,7 +248,7 @@ table td {
 }
 
 .ranking-champion-name {
-  font-size: 3.5rem;
+  font-size: clamp(2rem, 5.5vw, 5.5rem);
   font-weight: 800;
   line-height: 1.2;
   overflow: hidden;
@@ -258,7 +258,7 @@ table td {
 }
 
 .ranking-champion-pts {
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 2.6vw, 2.6rem);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.8);
   margin-top: 6px;
@@ -270,7 +270,7 @@ table td {
   align-items: center;
   padding: 16px 24px;
   border-radius: 8px;
-  font-size: 1.6rem;
+  font-size: clamp(1.1rem, 2.4vw, 2.4rem);
   font-weight: 600;
   min-width: 0;
 }
@@ -294,7 +294,7 @@ table td {
   flex-shrink: 0;
   margin-left: 16px;
   color: var(--text-dim);
-  font-size: 1.3rem;
+  font-size: clamp(0.95rem, 1.9vw, 1.9rem);
 }
 
 .ranking-silver {
@@ -316,7 +316,7 @@ table td {
 }
 
 .ranking-section-label {
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1vw, 1rem);
   font-weight: 600;
   color: var(--text-dim);
   text-align: left;
@@ -334,17 +334,18 @@ table td {
   padding: 10px 12px;
   border-bottom: 1px solid var(--card-border);
   min-width: 0;
+  font-size: clamp(0.95rem, 1.5vw, 1.5rem);
 }
 
 .ranking-row:last-child { border-bottom: none; }
 
 .ranking-row.compact {
   padding: 6px 12px;
-  font-size: 0.85rem;
+  font-size: clamp(0.8rem, 1.2vw, 1.2rem);
 }
 
 .ranking-row-rank {
-  width: 48px;
+  width: clamp(40px, 4vw, 64px);
   flex-shrink: 0;
   font-weight: 600;
   color: var(--text-dim);
