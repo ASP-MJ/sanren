@@ -26,7 +26,7 @@ function calculateScore(correct, guess) {
   if (matched === 3) return 5; // サンレンプク
   if (correct[0] === guess[0] && correct[1] === guess[1]) return 3; // 1-2位
   if (matched === 2) return 2; // 2つ的中
-  if (correct[0] === guess[0]) return 1; // 1位的中
+  if (matched === 1) return 1; // 3つのうち1つ的中
   return 0;
 }
 
@@ -96,7 +96,7 @@ function App() {
 
   const submitVote = () => {
     if (!myName.trim()) return alert("名前を入力してください");
-    if (new Set(guesses).size !== 3 || guesses.includes('')) return alert("重複なく3つ選んでください");
+    if (new Set(guesses).size !== 3 || guesses.includes('')) return alert("重複なく3名選んでください");
     localStorage.setItem('sanrentan_name', myName);
     localStorage.setItem(`sanrentan_guess_${state.current_q}`, JSON.stringify(guesses));
     socket.emit('submit-vote', { name: myName, guesses });
@@ -164,7 +164,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
        <div className="flex-between" style={{ marginBottom: '30px' }}>
         <h2 className="brand-title">
-          25周年記念
+          SANRENTAN
         </h2>
       </div>
 
@@ -226,7 +226,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
             </div>
           ) : (
             <div style={{ padding: '40px' }}>
-                <CheckCircle size={64} style={{ color: 'var(--color-accent)', marginBottom: '20px' }} />
+                <CheckCircle size={64} style={{ color: 'var(--color-primary)', marginBottom: '20px' }} />
                 <h3>受付完了！発表をお待ちください</h3>
             </div>
           )
@@ -241,16 +241,65 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
   );
 }
 
+const COUNTDOWN_SECONDS = 90; // 投票時間（1分半）
+
 function MonitorView({ state, ranking, revealStep }) {
+  const [remaining, setRemaining] = useState(null);
+
+  // is_open が true になった（投票開始）タイミングでカウント開始
+  useEffect(() => {
+    if (state.is_open && !state.show_ans) {
+      setRemaining(COUNTDOWN_SECONDS);
+      const timer = setInterval(() => {
+        setRemaining(prev => {
+          if (prev === null) return null;
+          if (prev <= 1) { clearInterval(timer); return 0; }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      setRemaining(null);
+    }
+  }, [state.is_open, state.show_ans, state.current_q]);
+
   if (revealStep !== 'OFF') {
     return <MonitorRankingView ranking={ranking} revealStep={revealStep} />;
   }
 
+  const mm = remaining !== null ? Math.floor(remaining / 60) : 0;
+  const ss = remaining !== null ? String(remaining % 60).padStart(2, '0') : '00';
+  const isUrgent = remaining !== null && remaining <= 10;
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4vh 0' }}>
       <div style={{ fontSize: 'clamp(1.2rem, 2vw, 2rem)', color: 'var(--text-dim)', marginBottom: '2vh' }}>第 {state.current_q} 問</div>
-      <h1 style={{ fontSize: 'clamp(2.5rem, 6.5vw, 7rem)', margin: '0 0 5vh 0', fontWeight: 800, lineHeight: 1.15 }}>{state.q_text}</h1>
-      
+      <h1 style={{ fontSize: 'clamp(2.5rem, 6.5vw, 7rem)', margin: '0 0 3vh 0', fontWeight: 800, lineHeight: 1.15 }}>{state.q_text}</h1>
+
+      {/* カウントダウン（投票受付中のみ表示） */}
+      {state.is_open && !state.show_ans && remaining !== null && (
+        <div style={{ marginBottom: '4vh' }}>
+          <motion.div
+            key={isUrgent ? 'urgent' : 'normal'}
+            animate={isUrgent ? { scale: [1, 1.08, 1] } : {}}
+            transition={{ duration: 0.6, repeat: isUrgent ? Infinity : 0 }}
+            style={{
+              display: 'inline-block',
+              fontSize: 'clamp(2.5rem, 7vw, 7rem)',
+              fontWeight: 800,
+              fontVariantNumeric: 'tabular-nums',
+              color: remaining === 0 ? 'var(--text-dim)' : (isUrgent ? 'var(--color-accent)' : 'var(--color-primary)'),
+              padding: '1vh 4vw',
+              borderRadius: '16px',
+              background: 'var(--card-bg)',
+              border: `3px solid ${isUrgent ? 'var(--color-accent)' : 'var(--card-border)'}`,
+            }}
+          >
+            {remaining === 0 ? '締切' : `${mm}:${ss}`}
+          </motion.div>
+        </div>
+      )}
+
       {!state.show_ans ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5vw' }}>
           {state.options.map(opt => (
@@ -435,6 +484,7 @@ function MonitorRankingView({ ranking, revealStep }) {
                 padding: '50px 60px'
               }}
             >
+              <div style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)', marginBottom: '10px' }}>🎁</div>
               <div style={{ fontSize: 'clamp(1.1rem, 2.4vw, 2.4rem)', fontWeight: 700, opacity: 0.85, marginBottom: '20px' }}>
                 25位 特別賞
               </div>
