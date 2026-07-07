@@ -226,7 +226,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
             </div>
           ) : (
             <div style={{ padding: '40px' }}>
-                <CheckCircle size={64} style={{ color: 'var(--color-primary)', marginBottom: '20px' }} />
+                <CheckCircle size={64} style={{ color: 'var(--color-accent)', marginBottom: '20px' }} />
                 <h3>受付完了！発表をお待ちください</h3>
             </div>
           )
@@ -272,33 +272,31 @@ function MonitorView({ state, ranking, revealStep }) {
   const isUrgent = remaining !== null && remaining <= 10;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4vh 0' }}>
-      <div style={{ fontSize: 'clamp(1.2rem, 2vw, 2rem)', color: 'var(--text-dim)', marginBottom: '2vh' }}>第 {state.current_q} 問</div>
-      <h1 style={{ fontSize: 'clamp(2.5rem, 6.5vw, 7rem)', margin: '0 0 3vh 0', fontWeight: 800, lineHeight: 1.15 }}>{state.q_text}</h1>
-
-      {/* カウントダウン（投票受付中のみ表示） */}
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4vh 0', position: 'relative' }}>
+      {/* カウントダウン（右上・枠なし） */}
       {state.is_open && !state.show_ans && remaining !== null && (
-        <div style={{ marginBottom: '4vh' }}>
-          <motion.div
-            key={isUrgent ? 'urgent' : 'normal'}
-            animate={isUrgent ? { scale: [1, 1.08, 1] } : {}}
-            transition={{ duration: 0.6, repeat: isUrgent ? Infinity : 0 }}
-            style={{
-              display: 'inline-block',
-              fontSize: 'clamp(2.5rem, 7vw, 7rem)',
-              fontWeight: 800,
-              fontVariantNumeric: 'tabular-nums',
-              color: remaining === 0 ? 'var(--text-dim)' : (isUrgent ? 'var(--color-accent)' : 'var(--color-primary)'),
-              padding: '1vh 4vw',
-              borderRadius: '16px',
-              background: 'var(--card-bg)',
-              border: `3px solid ${isUrgent ? 'var(--color-accent)' : 'var(--card-border)'}`,
-            }}
-          >
-            {remaining === 0 ? '締切' : `${mm}:${ss}`}
-          </motion.div>
-        </div>
+        <motion.div
+          key={isUrgent ? 'urgent' : 'normal'}
+          animate={isUrgent ? { opacity: [1, 0.4, 1] } : {}}
+          transition={{ duration: 0.6, repeat: isUrgent ? Infinity : 0 }}
+          style={{
+            position: 'absolute',
+            top: '1vh',
+            right: '2vw',
+            fontSize: 'clamp(2rem, 5vw, 5rem)',
+            fontWeight: 800,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '0.02em',
+            color: remaining === 0 ? 'var(--text-dim)' : (isUrgent ? 'var(--color-accent)' : 'var(--color-primary)'),
+            zIndex: 10,
+          }}
+        >
+          {remaining === 0 ? '締切' : `${mm}:${ss}`}
+        </motion.div>
       )}
+
+      <div style={{ fontSize: 'clamp(1.2rem, 2vw, 2rem)', color: 'var(--text-dim)', marginBottom: '2vh' }}>第 {state.current_q} 問</div>
+      <h1 style={{ fontSize: 'clamp(2.5rem, 6.5vw, 7rem)', margin: '0 0 5vh 0', fontWeight: 800, lineHeight: 1.15 }}>{state.q_text}</h1>
 
       {!state.show_ans ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5vw' }}>
