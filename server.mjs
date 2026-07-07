@@ -22,8 +22,8 @@ const DB_PATH = './db.json';
 const defaultState = {
   settings: {
     current_q: 1,
-    q_text: "世界の時価総額ランキングは？",
-    options: ["エヌビディア", "マイクロソフト", "アマゾン・ドット・コム", "ブロードコム", "台湾セミコンダクター・マニュファクチャリング", "アップル", "アルファベット"],
+    q_text: "第1レースの勝者は？",
+    options: ["ランナーA", "ランナーB", "ランナーC", "ランナーD", "ランナーE"],
     is_open: false,
     show_ans: false,
     last_ans: ["", "", ""]
@@ -54,7 +54,7 @@ function calculateScore(correct, guess) {
   if (matched === 3) return 5; // サンレンプク
   if (correct[0] === guess[0] && correct[1] === guess[1]) return 3; // 1-2位
   if (matched === 2) return 2; // 2つ的中
-  if (correct[0] === guess[0]) return 1; // 1位的中
+  if (matched === 1) return 1; // 3つのうち1つ的中
   return 0;
 }
 
