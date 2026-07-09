@@ -164,7 +164,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
        <div className="flex-between" style={{ marginBottom: '30px' }}>
         <h2 className="brand-title">
-          SANRENTAN
+          サンレンタン
         </h2>
       </div>
 
