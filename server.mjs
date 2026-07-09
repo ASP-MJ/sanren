@@ -155,6 +155,11 @@ io.on('connection', (socket) => {
     io.emit('ranking-reveal-update', step);
   });
 
+  // タイマー表示のON/OFFを全モニターに中継
+  socket.on('timer-visibility', (visible) => {
+    io.emit('timer-visibility', visible);
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
