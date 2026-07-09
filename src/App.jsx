@@ -245,6 +245,13 @@ const COUNTDOWN_SECONDS = 90; // 投票時間（1分半）
 
 function MonitorView({ state, ranking, revealStep }) {
   const [remaining, setRemaining] = useState(null);
+  const [timerVisible, setTimerVisible] = useState(true);
+
+  // 管理者からのタイマー表示切替を受信
+  useEffect(() => {
+    socket.on('timer-visibility', (visible) => setTimerVisible(visible));
+    return () => socket.off('timer-visibility');
+  }, []);
 
   // is_open が true になった（投票開始）タイミングでカウント開始
   useEffect(() => {
@@ -274,7 +281,7 @@ function MonitorView({ state, ranking, revealStep }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '4vh 0', position: 'relative' }}>
       {/* カウントダウン（右上・枠なし） */}
-      {state.is_open && !state.show_ans && remaining !== null && (
+      {state.is_open && !state.show_ans && remaining !== null && timerVisible && (
         <motion.div
           key={isUrgent ? 'urgent' : 'normal'}
           animate={isUrgent ? { opacity: [1, 0.4, 1] } : {}}
@@ -509,6 +516,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
   const [isLogged, setIsLogged] = useState(false);
   const [answerMode, setAnswerMode] = useState('manual'); // 'manual' | 'from-vote'
   const [votes, setVotes] = useState([]);
+  const [timerShown, setTimerShown] = useState(true);
 
   useEffect(() => {
     socket.on('votes-data', (data) => setVotes(data));
@@ -566,6 +574,13 @@ function AdminView({ state, socket, ranking, revealStep }) {
                     <button className="btn-primary" style={{ flex: 2 }} onClick={() => socket.emit('admin-action', { type: 'UPDATE_QUESTION', payload: { current_q: parseInt(qNum), q_text: qText, options: opts.split(',').map(s => s.trim()) } })}>投票開始</button>
                     <button className="btn-danger" style={{ flex: 1 }} onClick={() => socket.emit('admin-action', { type: 'CLOSE_VOTING' })}>締切</button>
                 </div>
+                <button
+                    className="btn-secondary"
+                    style={{ width: '100%', marginTop: '10px', fontSize: '0.85rem' }}
+                    onClick={() => { const next = !timerShown; setTimerShown(next); socket.emit('timer-visibility', next); }}
+                >
+                    タイマー表示：{timerShown ? 'ON（押すと非表示）' : 'OFF（押すと表示）'}
+                </button>
             </div>
             <div>
                 <h3>2. 正解入力・採点</h3>
