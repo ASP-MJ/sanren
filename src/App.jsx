@@ -242,6 +242,7 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
 }
 
 const COUNTDOWN_SECONDS = 90; // 投票時間（1分半）
+const PRIZE_SPONSOR = '株式会社〇〇〇〇'; // 特別賞の協賛名（後で書き換え）
 
 function MonitorView({ state, ranking, revealStep }) {
   const [remaining, setRemaining] = useState(null);
@@ -270,6 +271,9 @@ function MonitorView({ state, ranking, revealStep }) {
     }
   }, [state.is_open, state.show_ans, state.current_q]);
 
+  if (revealStep === 'INTRO') {
+    return <MonitorIntroView />;
+  }
   if (revealStep !== 'OFF') {
     return <MonitorRankingView ranking={ranking} revealStep={revealStep} />;
   }
@@ -330,10 +334,51 @@ function MonitorView({ state, ranking, revealStep }) {
   );
 }
 
+function MonitorIntroView() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{
+        minHeight: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <motion.div
+        initial={{ letterSpacing: '0.5em', opacity: 0 }}
+        animate={{ letterSpacing: '0.15em', opacity: 0.6 }}
+        transition={{ duration: 1.2 }}
+        style={{ fontSize: 'clamp(0.9rem, 1.8vw, 1.6rem)', fontWeight: 700, color: 'var(--color-accent)', marginBottom: '3vh' }}
+      >
+        RESULT
+      </motion.div>
+      <motion.h1
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', damping: 12, delay: 0.2 }}
+        style={{ fontSize: 'clamp(2.5rem, 7vw, 7.5rem)', fontWeight: 800, lineHeight: 1.2, margin: 0 }}
+      >
+        まもなく<br />結果発表
+      </motion.h1>
+      <motion.div
+        animate={{ opacity: [0.3, 1, 0.3] }}
+        transition={{ duration: 1.8, repeat: Infinity }}
+        style={{ fontSize: 'clamp(1rem, 2vw, 2rem)', color: 'var(--text-dim)', marginTop: '4vh', fontWeight: 600 }}
+      >
+        しばらくお待ちください
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function MonitorRankingView({ ranking, revealStep }) {
   const top3 = ranking.slice(0, 3);
   const midRanks = ranking.slice(3, 10); // 4位〜10位
-  const lowerRanks = ranking.slice(10); // 11位〜
+  const lowerRanks = ranking.slice(10, 20); // 11位〜20位
   const prizeRank = ranking.length >= 25 ? ranking[24] : null; // 25位
 
   const steps = ['LOWER', 'MID', '3RD', '2ND', '1ST', 'PRIZE'];
@@ -357,7 +402,7 @@ function MonitorRankingView({ ranking, revealStep }) {
   return (
     <div style={{ textAlign: 'center', padding: '3vh 2vw', maxWidth: 'min(1400px, 92vw)', margin: '0 auto' }}>
       <h1 style={{ fontSize: 'clamp(2rem, 4.2vw, 4.2rem)', marginBottom: '3vh', fontWeight: 800 }}>
-        <Trophy size={40} style={{ color: '#ffd700', verticalAlign: 'middle', marginRight: '12px' }} />
+        <Trophy size={40} style={{ color: 'var(--color-accent)', verticalAlign: 'middle', marginRight: '12px' }} />
         総合ランキング発表
       </h1>
 
@@ -443,8 +488,8 @@ function MonitorRankingView({ ranking, revealStep }) {
               animate="show"
               className="ranking-section"
             >
-              <div className="ranking-section-label">11位〜{ranking.length}位</div>
-              <div className="ranking-lower-scroll">
+              <div className="ranking-section-label">11位〜20位</div>
+              <div>
                 {lowerRanks.map((r, i) => (
                   <motion.div key={r.name} variants={fadeUp} className="ranking-row compact">
                     <span className="ranking-row-rank">{i + 11}位</span>
@@ -482,22 +527,41 @@ function MonitorRankingView({ ranking, revealStep }) {
               initial={{ scale: 0.6, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               transition={{ type: 'spring', damping: 14, stiffness: 200 }}
-              className="ranking-prize"
               style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                width: 'min(460px, 90vw)',
+                overflow: 'hidden',
+                boxShadow: '0 24px 60px rgba(3, 69, 122, 0.4)',
                 textAlign: 'center',
-                maxWidth: '90vw',
-                padding: '50px 60px'
               }}
             >
-              <div style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)', marginBottom: '10px' }}>🎁</div>
-              <div style={{ fontSize: 'clamp(1.1rem, 2.4vw, 2.4rem)', fontWeight: 700, opacity: 0.85, marginBottom: '20px' }}>
-                25位 特別賞
+              {/* ヘッダー */}
+              <div style={{ background: 'var(--color-primary)', padding: '22px 24px', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--color-accent)' }} />
+                <div style={{ fontSize: 'clamp(0.7rem, 1.2vw, 0.9rem)', fontWeight: 700, letterSpacing: '0.3em', color: 'rgba(255,255,255,0.6)' }}>SPECIAL PRIZE</div>
+                <div style={{ fontSize: 'clamp(1.4rem, 2.6vw, 1.8rem)', fontWeight: 800, color: '#ffffff', marginTop: '4px' }}>特別賞</div>
               </div>
-              <div style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px' }}>
-                {prizeRank.name}
+
+              {/* 受賞者 */}
+              <div style={{ padding: '28px 32px 24px' }}>
+                <div style={{ display: 'inline-block', background: 'var(--color-accent-light)', color: 'var(--color-accent)', fontSize: 'clamp(0.75rem, 1.3vw, 0.95rem)', fontWeight: 700, padding: '5px 18px', borderRadius: '100px', marginBottom: '16px' }}>
+                  総合 25 位
+                </div>
+                <div style={{ fontSize: 'clamp(2rem, 4.5vw, 2.8rem)', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.1, marginBottom: '8px' }}>
+                  {prizeRank.name}
+                </div>
+                <div style={{ fontSize: 'clamp(1.1rem, 2vw, 1.3rem)', fontWeight: 700, color: 'var(--color-primary)' }}>
+                  {prizeRank.total} pts
+                </div>
               </div>
-              <div style={{ fontSize: 'clamp(1.3rem, 3vw, 3rem)', fontWeight: 700, opacity: 0.9 }}>
-                {prizeRank.total} pts
+
+              {/* 協賛 */}
+              <div style={{ padding: '4px 32px 28px' }}>
+                <div style={{ background: 'var(--bg-color)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ fontSize: 'clamp(0.65rem, 1vw, 0.75rem)', fontWeight: 600, color: 'var(--text-dim)', letterSpacing: '0.2em', marginBottom: '6px' }}>協　賛</div>
+                  <div style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)', fontWeight: 800, color: 'var(--color-primary)' }}>{PRIZE_SPONSOR}</div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -554,7 +618,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
       <div className="glass-card" style={{ padding: '30px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>🔧 管理ポータル</h2>
+            <h2>管理ポータル</h2>
             <div style={{ display: 'flex', gap: '10px' }}>
                 <Link to="/" className="glass-card" style={{ padding: '8px 12px', color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem' }}>参加者</Link>
                 <Link to="/monitor" className="glass-card" style={{ padding: '8px 12px', color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem' }}>モニター</Link>
@@ -610,7 +674,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
                   </>
                 ) : (
                   <>
-                    <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '10px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+                    <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '10px', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
                       {votes.length === 0 ? (
                         <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
                           投票データがありません
@@ -622,7 +686,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
                             padding: '8px 12px',
                             borderBottom: i < votes.length - 1 ? '1px solid var(--card-border)' : 'none',
                             background: correct[0] === v.guesses[0] && correct[1] === v.guesses[1] && correct[2] === v.guesses[2]
-                              ? 'rgba(0,230,118,0.1)' : 'transparent'
+                              ? 'var(--color-primary-light)' : 'transparent'
                           }}>
                             <div style={{ fontSize: '0.8rem' }}>
                               <span style={{ fontWeight: 'bold', marginRight: '10px' }}>{v.name}</span>
@@ -640,7 +704,7 @@ function AdminView({ state, socket, ranking, revealStep }) {
                       )}
                     </div>
                     {correct[0] && (
-                      <div style={{ fontSize: '0.85rem', padding: '8px', background: 'rgba(0,230,118,0.05)', borderRadius: '6px', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '0.85rem', padding: '8px', background: 'var(--color-primary-light)', borderRadius: '6px', marginBottom: '8px' }}>
                         正解にセット済: <strong>{correct[0]} → {correct[1]} → {correct[2]}</strong>
                       </div>
                     )}
@@ -651,22 +715,23 @@ function AdminView({ state, socket, ranking, revealStep }) {
             </div>
         </div>
 
-        <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+        <div style={{ marginTop: '40px', borderTop: '1px solid var(--card-border)', paddingTop: '20px' }}>
             <h3>3. 最終ランキング演出コントロール</h3>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button className="btn-danger" onClick={() => setStep('INTRO')}><Play size={16} /> 結果発表準備（まもなく〜）</button>
                 <button className="btn-primary" onClick={() => setStep('LOWER')}><Play size={16} /> 参加者〜11位</button>
                 <button className="btn-primary" onClick={() => setStep('MID')}><SkipForward size={16} /> 10〜4位</button>
                 <button className="btn-primary" onClick={() => setStep('3RD')}><SkipForward size={16} /> 3位発表</button>
                 <button className="btn-primary" onClick={() => setStep('2ND')}><SkipForward size={16} /> 2位発表</button>
                 <button className="btn-primary" onClick={() => setStep('1ST')}><Trophy size={16} /> 優勝者発表</button>
-                <button className="btn-primary" onClick={() => setStep('PRIZE')}>🎁 25位(特別賞)</button>
+                <button className="btn-primary" onClick={() => setStep('PRIZE')}>25位(特別賞)</button>
                 <button className="btn-secondary" onClick={() => setStep('OFF')}><RotateCcw size={16} /> 演出リセット</button>
             </div>
         </div>
 
         {/* 全リセット（イベントやり直し用） */}
-        <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,75,75,0.3)', paddingTop: '20px' }}>
-            <h3 style={{ color: 'var(--color-accent)' }}>⚠️ 危険ゾーン</h3>
+        <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255, 82, 30, 0.3)', paddingTop: '20px' }}>
+            <h3 style={{ color: 'var(--color-accent)' }}>危険ゾーン</h3>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
                 全投票・全ランキングを消去し、問題番号を1に戻します。全ブラウザの投票ロックも解除されます。
             </p>
@@ -682,8 +747,8 @@ function AdminView({ state, socket, ranking, revealStep }) {
         <h3>順位</h3>
         <div style={{ maxHeight: '650px', overflowY: 'auto' }}>
             {ranking.map((r, i) => (
-                <div key={r.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 4px', borderBottom: '1px solid var(--card-border)', background: i === 24 ? 'rgba(255,75,75,0.1)' : 'transparent' }}>
-                    <span>{i+1}. {r.name} {i === 24 ? '🎁' : ''}</span>
+                <div key={r.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 4px', borderBottom: '1px solid var(--card-border)', background: i === 24 ? 'var(--color-accent-light)' : 'transparent' }}>
+                    <span>{i+1}. {r.name} {i === 24 ? '（特別賞）' : ''}</span>
                     <span style={{ fontWeight: 'bold' }}>{r.total} pts</span>
                 </div>
             ))}
@@ -699,10 +764,10 @@ function RankingView({ ranking, goBack }) {
         <motion.div initial={{ opacity: 0 }} className="glass-card" style={{ padding: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
                 <button onClick={goBack} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', marginRight: '15px' }}><ChevronLeft size={24} /></button>
-                <h1 style={{ margin: 0 }}><Trophy style={{ color: '#ffd700', marginRight: '10px' }} /> あなたの順位結果</h1>
+                <h1 style={{ margin: 0 }}><Trophy style={{ color: 'var(--color-accent)', marginRight: '10px', verticalAlign: 'middle' }} /> あなたの順位結果</h1>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead><tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-dim)' }}><th style={{ textAlign: 'left', padding: '15px' }}>順位</th><th style={{ textAlign: 'left', padding: '15px' }}>名前</th><th style={{ textAlign: 'right', padding: '15px' }}>ポイント</th></tr></thead>
+                <thead><tr style={{ borderBottom: '1px solid var(--card-border)', color: 'var(--text-dim)' }}><th style={{ textAlign: 'left', padding: '15px' }}>順位</th><th style={{ textAlign: 'left', padding: '15px' }}>名前</th><th style={{ textAlign: 'right', padding: '15px' }}>ポイント</th></tr></thead>
                 <tbody>{ranking.map((row, i) => (
                     <tr key={row.name} style={{ borderBottom: '1px solid var(--card-border)' }}><td style={{ padding: '15px', fontWeight: 'bold' }}>{i + 1}</td><td style={{ padding: '15px' }}>{row.name}</td><td style={{ padding: '15px', textAlign: 'right', color: 'var(--color-primary)', fontWeight: 'bold' }}>{row.total} pts</td></tr>
                 ))}</tbody>
