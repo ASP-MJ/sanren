@@ -241,8 +241,8 @@ function ParticipantView({ state, myName, setMyName, guesses, setGuesses, submit
   );
 }
 
-const COUNTDOWN_SECONDS = 90; // 投票時間（1分半）
-const PRIZE_SPONSOR = '株式会社〇〇〇〇'; // 特別賞の協賛名（後で書き換え）
+const COUNTDOWN_SECONDS = 60; // 投票時間（1分）
+const PRIZE_SPONSOR = 'ANAクラウンプラザホテル広島'; // 特別賞の協賛名
 
 function MonitorView({ state, ranking, revealStep }) {
   const [remaining, setRemaining] = useState(null);
